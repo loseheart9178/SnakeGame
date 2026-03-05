@@ -1,0 +1,28 @@
+# Ignore object files and build artifacts
+*.o
+*.obj
+*.exe
+*.out
+*.dll
+*.exe
+
+# Ignore backups and temporary files
+*~
+*.tmp
+
+# Ignore editor directories and settings
+.vscode/
+.idea/
+
+# Ignore compiled libraries
+*.a
+*.lib
+
+# Ignore dependency directories
+build/
+
+# MacOS
+.DS_Store
+
+# Windows thumbnail cache files
+Thumbs.db
