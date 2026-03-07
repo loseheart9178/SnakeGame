@@ -35,8 +35,8 @@ void HideCursor();         // 定义函数用于隐藏光标
 int InitMenu();            // 定义函数用于显示菜单并获取用户选择
 void Helper();             // 定义函数用于显示帮助信息
 void About();              // 定义函数用于显示关于信息
-void InitGame();           // 定义函数用于初始化游戏状态
 void InitMap();            // 定义函数用于绘制游戏地图
+void InitSnake();          // 定义函数用于初始化蛇
 int MoveSnake();           // 定义函数用于移动蛇
 void GenerateFood();       // 定义函数用于生成食物
 int CheckCollision();      // 定义函数用于检查碰撞
