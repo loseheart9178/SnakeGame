@@ -15,7 +15,7 @@ int main()
             InitMap();      // 初始化游戏地图
             InitSnake();    // 初始化蛇
             GenerateFood(); // 生成食物
-            while (MoveSnake)
+            while (MoveSnake() )
                 ;
 
             break;
