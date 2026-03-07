@@ -17,5 +17,7 @@ void HideCursor() // 定义函数用于隐藏光标
 {
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE); // 获取标准输出设备的句柄
     CONSOLE_CURSOR_INFO cursorInfo = {1, 0};       // 定义一个CONSOLE_CURSOR_INFO结构体变量用于存储光标信息，设置光标大小为1，隐藏光标
-    SetConsoleCursorInfo(hOut, &cursorInfo);       // 设置新的光标信息
+    SetConsoleCursorInfo(hOut, &cursorInfo);  //asd
+         // 设置新的光标信息//
+         //test
 }
