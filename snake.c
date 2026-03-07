@@ -51,3 +51,37 @@ int InitMenu() // 定义函数用于显示菜单并获取用户选择
     }
     return result; // 返回用户选择的结果
 }
+void About() // 定义函数用于显示关于信息
+{
+    GotoXY(30, 12);
+    printf("杭州电子科技大学--程序设计综合实践");
+    GotoXY(43, 14);
+    printf("贪吃蛇游戏");
+    GotoXY(43, 16);
+    printf("按任意键返回菜单");
+    HideCursor();
+    char choice = getch(); // 获取用户输入的选择
+    system("cls");         // 清屏
+}
+void Helper() // 定义函数用于显示帮助信息
+{
+    GotoXY(40, 12);
+    printf("游戏规则：");
+    GotoXY(40, 14);
+    printf("1. 使用WASD键控制蛇的移动方向");
+    GotoXY(40, 16);
+    printf("2. 吃到食物会变长，得分增加");
+    GotoXY(40, 18);
+    printf("3. 碰到墙壁或自己会游戏结束");
+    GotoXY(45, 20);
+    printf("按任意键返回菜单");
+    HideCursor();
+    char choice = getch(); // 获取用户输入的选择
+    system("cls");         // 清屏
+}
+void InitMap() {}
+void InitSnake() {}
+void GenerateFood() {}
+int MoveSnake() {}
+int CheckCollision() {}
+void SpeedControl() {}
