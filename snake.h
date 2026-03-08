@@ -18,18 +18,28 @@
 #define MAP_CHAR '|'                              // 定义地图的显示字符`
 
 // 定义游戏相关的结构体
-typedef struct
+typedef struct SnakeNode
 {
-    int x;         // 蛇头的x坐标
-    int y;         // 蛇头的y坐标
-} Food, SnakeNode; // 定义食物和蛇节点的结构体
+    int x;
+    int y;
+    struct SnakeNode *prev;
+    struct SnakeNode *next;
+} SnakeNode;
 
 typedef struct
 {
-    SnakeNode body[MAP_HEIGHT * MAP_WIDTH]; // 蛇身体的数组，最大长度为地图面积
-    int length;                             // 蛇的长度
-    int speed;                              // 蛇的速度
-} Snake;                                    // 定义蛇的结构体
+    int x;
+    int y;
+} Food;
+
+typedef struct
+{
+    SnakeNode *head;        // 指向蛇头的指针
+    SnakeNode *tail;        // 指向蛇尾的指针
+    int length;             // 蛇的长度
+    int speed;              // 蛇的速度
+} Snake;
+
 
 // 定义游戏相关的函数
 void GotoXY(int x, int y); // 定义函数用于设置光标位置
@@ -43,3 +53,4 @@ int MoveSnake();           // 定义函数用于移动蛇
 void GenerateFood();       // 定义函数用于生成食物
 int CheckCollision();      // 定义函数用于检查碰撞
 void SpeedControl();       // 定义函数用于控制蛇的速度
+void FreeSnake();          // 定义函数用于释放蛇的内存

@@ -1,5 +1,6 @@
 #include "snake.h"
 
+
 Snake snake;                // 定义全局变量蛇
 Food food;                  // 定义全局变量食物
 char now_Direction = RIGHT; // 定义全局变量当前方向
@@ -107,21 +108,37 @@ void InitMap() // 定义函数用于绘制游戏地图
 }
 void InitSnake() // 定义函数用于初始化蛇
 {
-    snake.length = INITIAL_SNAKE_LENGTH; // 设置蛇的初始长度
-    snake.speed = 250;                   // 设置蛇的初始速度
-    now_Direction = RIGHT;               // 设置蛇的初始移动方向
-    // 设置蛇头位置在地图中心
-    snake.body[0].x = MAP_WIDTH / 2 - 1;      // 设置蛇头的x坐标
-    snake.body[0].y = MAP_HEIGHT / 2 - 1;     // 设置蛇头的y坐标
-    GotoXY(snake.body[0].x, snake.body[0].y); // 设置光标位置`
-    printf("%c", SNAKE_HEAD_CHAR);            // 显示蛇头
-    // 设置蛇身的位置
-    for (int i = 1; i < snake.length; i++)
-    {
-        snake.body[i].x = snake.body[i - 1].x - 1; // 设置蛇身的x坐标
-        snake.body[i].y = snake.body[i - 1].y;     // 设置蛇身的y坐标
-        GotoXY(snake.body[i].x, snake.body[i].y);
-        printf("%c", SNAKE_BODY_CHAR); // 显示蛇身
+    // 释放之前的内存（如果存在）
+    FreeSnake();
+    
+    snake.length = INITIAL_SNAKE_LENGTH;
+    snake.speed = 250;
+    now_Direction = RIGHT;
+
+    // 创建蛇头
+    snake.head = (SnakeNode*)malloc(sizeof(SnakeNode));
+    snake.head->x = MAP_WIDTH / 2 - 1;
+    snake.head->y = MAP_HEIGHT / 2 - 1;
+    snake.head->prev = NULL;
+    snake.head->next = NULL;
+    snake.tail = snake.head;
+
+    GotoXY(snake.head->x, snake.head->y);
+    printf("%c", SNAKE_HEAD_CHAR);
+
+    // 创建初始蛇身
+    for (int i = 1; i < snake.length; i++) {
+        SnakeNode *newNode = (SnakeNode*)malloc(sizeof(SnakeNode));
+        newNode->x = snake.tail->x - 1;
+        newNode->y = snake.tail->y;
+        
+        newNode->prev = snake.tail;
+        newNode->next = NULL;
+        snake.tail->next = newNode;
+        snake.tail = newNode;
+
+        GotoXY(newNode->x, newNode->y);
+        printf("%c", SNAKE_BODY_CHAR);
     }
 }
 void GenerateFood() // 定义函数用于生成食物
@@ -134,13 +151,13 @@ void GenerateFood() // 定义函数用于生成食物
         y = rand() % (MAP_HEIGHT - 2) + 1; // 生成随机的y坐标，范围在地图内
         // 检查(x, y)是否与蛇身体重叠
         valid = 1;
-        for (int i = 0; i < snake.length; i++)
-        {
-            if (x == snake.body[i].x && y == snake.body[i].y)
-            {
+        SnakeNode *curr = snake.head;
+        while (curr != NULL) {
+            if (x == curr->x && y == curr->y) {
                 valid = 0; // 与蛇身体重叠，重新生成
                 break;
             }
+            curr = curr->next;
         }
     }
     food.x = x;              // 设置食物的x坐标
@@ -151,16 +168,10 @@ void GenerateFood() // 定义函数用于生成食物
 int MoveSnake()
 {
     fflush(stdout);
-    SnakeNode temp = snake.body[snake.length - 1]; // 保存蛇尾的位置
-    // 移动蛇身
-    for (int i = snake.length - 1; i > 0; i--)
-        snake.body[i] = snake.body[i - 1];    // 将蛇身的每个节点移动到前一个节点的位置
-    GotoXY(snake.body[1].x, snake.body[1].y); // 设置光标位置
-    printf("%c", SNAKE_BODY_CHAR);            // 在原蛇头位置显示蛇身
-    // 根据键盘输入更新蛇头位置
-    if (_kbhit())
-    {
-        direction = getch(); // 获取用户输入的方向
+    
+    // 1. 获取输入（同原逻辑）
+    if (_kbhit()) {
+        direction = getch();
         switch (direction)
         {
         case UP:
@@ -181,71 +192,77 @@ int MoveSnake()
             break;
         }
     }
-    // 根据当前方向更新蛇头位置
-    switch (now_Direction)
-    {
-    case UP:
-        snake.body[0].y--; // 向上移动，y坐标减1
-        break;
-    case DOWN:
-        snake.body[0].y++; // 向下移动，y坐标加1
-        break;
-    case LEFT:
-        snake.body[0].x--; // 向左移动，x坐标减1
-        break;
-    case RIGHT:
-        snake.body[0].x++; // 向右移动，x坐标加1
-        break;
+
+    // 2. 创建新头节点
+    SnakeNode *newHead = (SnakeNode*)malloc(sizeof(SnakeNode));
+    newHead->x = snake.head->x;
+    newHead->y = snake.head->y;
+    
+    switch (now_Direction) {
+        case UP:    newHead->y--; break;
+        case DOWN:  newHead->y++; break;
+        case LEFT:  newHead->x--; break;
+        case RIGHT: newHead->x++; break;
     }
-    // 显示蛇头
-    GotoXY(snake.body[0].x, snake.body[0].y);
-    printf("%c", SNAKE_HEAD_CHAR); // 显示蛇头
-    // 检查是否吃到食物
-    if (snake.body[0].x == food.x && snake.body[0].y == food.y)
-    {
-        snake.body[snake.length] = temp; // 新增的节点初始化为旧蛇尾位置
-        snake.length++;                                          // 增加蛇的长度
-        if (snake.length > Max_SNAKE_LENGTH)                     // 如果蛇的长度超过最大长度，则游戏结束
-            return 0;                                            // 返回0表示游戏结束
-        GenerateFood();                                          // 生成新的食物
-        GotoXY(50, 5);                                           // 设置光标位置
-        printf("得分：%d", snake.length - INITIAL_SNAKE_LENGTH); // 显示当前得分，得分等于蛇的长度减去初始长度
+
+    // 将旧头改为身体符号
+    GotoXY(snake.head->x, snake.head->y);
+    printf("%c", SNAKE_BODY_CHAR);
+
+    // 插入新头
+    newHead->next = snake.head;
+    newHead->prev = NULL;
+    snake.head->prev = newHead;
+    snake.head = newHead;
+
+    GotoXY(snake.head->x, snake.head->y);
+    printf("%c", SNAKE_HEAD_CHAR);
+
+    // 3. 检查吃到食物
+    if (snake.head->x == food.x && snake.head->y == food.y) {
+        snake.length++;
+        GenerateFood();
+        GotoXY(50, 5);
+        printf("得分：%d", snake.length - INITIAL_SNAKE_LENGTH);
+    } else {
+        // 没吃到食物：移除尾部
+        SnakeNode *oldTail = snake.tail;
+        GotoXY(oldTail->x, oldTail->y);
+        printf(" "); // 清除屏幕上的尾巴
+        
+        snake.tail = oldTail->prev;
+        snake.tail->next = NULL;
+        free(oldTail); // 释放内存
     }
-    else
-    {
-        // 清除蛇尾
-        GotoXY(temp.x, temp.y);
-        printf(" "); // 在原蛇尾位置显示空格，清除蛇尾
-    }
-    // 检查碰撞
-    if (!CheckCollision())
-    {
-        system("cls");                              // 可以保留或去掉
+
+    // 4. 检查碰撞
+    if (!CheckCollision()) {
+        // 修复你之前提到的“Game Over 看不到内容”的问题
         GotoXY(45, 14);
-        printf("你的得分: %d", snake.length - INITIAL_SNAKE_LENGTH);
+        printf("Game Over! Score: %d", snake.length - INITIAL_SNAKE_LENGTH);
         GotoXY(45, 16);
         printf("GAME OVER!");
-        GotoXY(45, 18);
-        printf("按任意键返回主菜单");
-        getch();                                    // 等待玩家
-        system("cls");                              // 再清屏
+        getch(); // 等待按键
+        system("cls");
         return 0;
     }
-    // 控制蛇的速度
+
     SpeedControl();
-    Sleep(snake.speed); // 根据蛇的速度暂停一段时间，控制蛇的移动速度
-    return 1;          // 返回1表示游戏继续
+    Sleep(snake.speed);
+    return 1;
 }
 int CheckCollision()
 {
-    // 检查蛇头是否碰到墙壁
-    if (snake.body[0].x <= 0 || snake.body[0].x >= MAP_WIDTH - 1 || snake.body[0].y <= 0 || snake.body[0].y >= MAP_HEIGHT - 1)
+    // 碰墙
+    if (snake.head->x <= 0 || snake.head->x >= MAP_WIDTH - 1 || 
+        snake.head->y <= 0 || snake.head->y >= MAP_HEIGHT - 1)
         return 0; // 返回0表示没有发生碰撞
-    // 检查蛇头是否碰到自己
-    for (int i = 1; i < snake.length; i++)
-    {
-        if (snake.body[0].x == snake.body[i].x && snake.body[0].y == snake.body[i].y)
+    // 碰自己
+    SnakeNode *curr = snake.head->next;
+    while (curr != NULL) {
+        if (snake.head->x == curr->x && snake.head->y == curr->y)
             return 0; // 返回0表示发生碰撞
+        curr = curr->next;
     }
     return 1; // 返回1表示没有发生碰撞
 }
@@ -284,4 +301,16 @@ void SpeedControl()
         snake.speed = 200;
         break;
     }
+}
+
+// 增加内存释放函数
+void FreeSnake()
+{
+    SnakeNode *curr = snake.head;
+    while (curr != NULL) {
+        SnakeNode *next = curr->next;
+        free(curr);
+        curr = next;
+    }
+    snake.head = snake.tail = NULL;
 }
