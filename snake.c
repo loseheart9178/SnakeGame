@@ -54,11 +54,11 @@ int InitMenu() // 定义函数用于显示菜单并获取用户选择
 void About() // 定义函数用于显示关于信息
 {
     GotoXY(30, 12);
-    printf("Hangzhou Dianzi University - Comprehensive Programming Practice");
+    printf("杭州电子科技大学 - 综合编程实践");
     GotoXY(43, 14);
-    printf("Snake Game");
+    printf("贪吃蛇游戏");
     GotoXY(43, 16);
-    printf("Press any key to return to menu");
+    printf("按任意键返回菜单");
     HideCursor();
     char choice = getch(); // 获取用户输入的选择
     system("cls");         // 清屏
@@ -66,15 +66,15 @@ void About() // 定义函数用于显示关于信息
 void Helper() // 定义函数用于显示帮助信息
 {
     GotoXY(40, 12);
-    printf("Game Rules:");
+    printf("游戏规则:");
     GotoXY(40, 14);
-    printf("1. Use WASD keys to control snake movement");
+    printf("1. 使用WASD键控制蛇的移动");
     GotoXY(40, 16);
-    printf("2. Eating food makes snake longer, score increases");
+    printf("2. 吃食物使蛇变长，得分增加");
     GotoXY(40, 18);
-    printf("3. Hitting wall or self ends game");
+    printf("3. 碰到墙或自己会游戏结束");
     GotoXY(45, 20);
-    printf("Press any key to return to menu");
+    printf("按任意键返回菜单");
     HideCursor();
     char choice = getch(); // 获取用户输入的选择
     system("cls");         // 清屏
@@ -97,6 +97,10 @@ void InitMap() // 定义函数用于绘制游戏地图
         GotoXY(MAP_WIDTH - 1, i);
         printf("%c", MAP_CHAR);
     }
+
+    //生成初始食物
+    GenerateFood();
+
     // 显示初始得分
     GotoXY(50, 5);
     printf("得分：0");
@@ -123,11 +127,22 @@ void InitSnake() // 定义函数用于初始化蛇
 void GenerateFood() // 定义函数用于生成食物
 {
     int x, y;
-    do
+    int valid = 0;
+    while (!valid)
     {
         x = rand() % (MAP_WIDTH - 2) + 1;  // 生成随机的x坐标，范围在地图内
         y = rand() % (MAP_HEIGHT - 2) + 1; // 生成随机的y坐标，范围在地图内
-    } while (CheckCollision(x, y)); // 检查生成的食物位置是否与蛇身体重叠，如果重叠则重新生成
+        // 检查(x, y)是否与蛇身体重叠
+        valid = 1;
+        for (int i = 0; i < snake.length; i++)
+        {
+            if (x == snake.body[i].x && y == snake.body[i].y)
+            {
+                valid = 0; // 与蛇身体重叠，重新生成
+                break;
+            }
+        }
+    }
     food.x = x;              // 设置食物的x坐标
     food.y = y;              // 设置食物的y坐标
     GotoXY(food.x, food.y);  // 设置光标位置
@@ -135,6 +150,7 @@ void GenerateFood() // 定义函数用于生成食物
 }
 int MoveSnake()
 {
+    fflush(stdout);
     SnakeNode temp = snake.body[snake.length - 1]; // 保存蛇尾的位置
     // 移动蛇身
     for (int i = snake.length - 1; i > 0; i--)
@@ -187,6 +203,7 @@ int MoveSnake()
     // 检查是否吃到食物
     if (snake.body[0].x == food.x && snake.body[0].y == food.y)
     {
+        snake.body[snake.length] = temp; // 新增的节点初始化为旧蛇尾位置
         snake.length++;                                          // 增加蛇的长度
         if (snake.length > Max_SNAKE_LENGTH)                     // 如果蛇的长度超过最大长度，则游戏结束
             return 0;                                            // 返回0表示游戏结束
