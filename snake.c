@@ -220,15 +220,16 @@ int MoveSnake()
     // 检查碰撞
     if (!CheckCollision())
     {
-        system("cls"); // 清屏
+        system("cls");                              // 可以保留或去掉
         GotoXY(45, 14);
-        printf("Game Over! Your score is: %d", snake.length - INITIAL_SNAKE_LENGTH); // 显示游戏结束信息和最终得分
+        printf("你的得分: %d", snake.length - INITIAL_SNAKE_LENGTH);
         GotoXY(45, 16);
         printf("GAME OVER!");
         GotoXY(45, 18);
-        printf("Press any key to return to menu");
-        system("cls"); // 清屏
-        return 0;      // 返回0表示游戏结束
+        printf("按任意键返回主菜单");
+        getch();                                    // 等待玩家
+        system("cls");                              // 再清屏
+        return 0;
     }
     // 控制蛇的速度
     SpeedControl();
