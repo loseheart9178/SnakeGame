@@ -12,8 +12,10 @@
 #define RIGHT 'd'                                 // 定义向右移动的按键
 #define INITIAL_SNAKE_LENGTH 3                    // 定义初始蛇的长度
 #define Max_SNAKE_LENGTH (MAP_HEIGHT * MAP_WIDTH) // 定义蛇的最大长度为地图面积
-#define FOOD_CHAR 'O'                             // 定义食物的显示字符
-#define SNAKE_CHAR 'X'                            // 定义蛇身的显示字符
+#define FOOD_CHAR '$'                             // 定义食物的显示字符
+#define SNAKE_HEAD_CHAR '@'                       // 定义蛇头的显示字符
+#define SNAKE_BODY_CHAR 'o'                       // 定义蛇身的显示字符
+#define MAP_CHAR '|'                              // 定义地图的显示字符`
 
 // 定义游戏相关的结构体
 typedef struct
