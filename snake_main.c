@@ -4,7 +4,8 @@
 
 int main()
 {  
-    setlocale(LC_ALL, ""); // 设置本地化以支持中文显示
+   
+    setlocale(LC_ALL, "");     // 设置本地化以支持中文显示
     srand((unsigned int)time(0)); // 使用当前时间作为随机数生成的种子
     int end = 1;                  // 定义一个变量用于控制游戏循环
     int choice;                   // 定义一个变量用于存储用户的选择

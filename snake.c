@@ -236,8 +236,9 @@ int MoveSnake()
     }
 
     // 4. 检查碰撞
-    if (!CheckCollision()) {
-        // 修复你之前提到的“Game Over 看不到内容”的问题
+    SnakeNode* collisionNode = CheckCollision();
+    if (collisionNode == (SnakeNode*)-1) {
+        // 墙碰撞，结束
         GotoXY(45, 14);
         printf("Game Over! Score: %d", snake.length - INITIAL_SNAKE_LENGTH);
         GotoXY(45, 16);
@@ -245,26 +246,51 @@ int MoveSnake()
         getch(); // 等待按键
         system("cls");
         return 0;
+    } else if (collisionNode != NULL) {
+        // 自撞后，截断从collisionNode到tail
+        SnakeNode* newTail = collisionNode->prev;  // 保存新的tail
+        SnakeNode* curr = collisionNode;
+        while (curr != NULL) {
+            SnakeNode* next = curr->next;
+            GotoXY(curr->x, curr->y);
+            printf(" ");
+            free(curr);
+            snake.length--;
+            curr = next;
+        }
+        // 更新tail
+        snake.tail = newTail;
+        if (snake.tail) snake.tail->next = NULL;
+        // 检查长度
+        if (snake.length <= 1) {
+            GotoXY(45, 14);
+            printf("Game Over! Score: %d", snake.length - INITIAL_SNAKE_LENGTH);
+            GotoXY(45, 16);
+            printf("GAME OVER!");
+            getch(); // 等待按键
+            system("cls");
+            return 0;
+        }
     }
 
     SpeedControl();
     Sleep(snake.speed);
     return 1;
 }
-int CheckCollision()
+SnakeNode* CheckCollision()
 {
     // 碰墙
     if (snake.head->x <= 0 || snake.head->x >= MAP_WIDTH - 1 || 
         snake.head->y <= 0 || snake.head->y >= MAP_HEIGHT - 1)
-        return 0; // 返回0表示没有发生碰撞
+        return (SnakeNode*)-1; // 特殊值表示墙碰撞
     // 碰自己
     SnakeNode *curr = snake.head->next;
     while (curr != NULL) {
         if (snake.head->x == curr->x && snake.head->y == curr->y)
-            return 0; // 返回0表示发生碰撞
+            return curr; // 返回碰撞的节点
         curr = curr->next;
     }
-    return 1; // 返回1表示没有发生碰撞
+    return NULL; // 没有碰撞
 }
 void SpeedControl()
 {
@@ -303,7 +329,7 @@ void SpeedControl()
     }
 }
 
-// 增加内存释放函数
+//  增加内存释放函数
 void FreeSnake()
 {
     SnakeNode *curr = snake.head;

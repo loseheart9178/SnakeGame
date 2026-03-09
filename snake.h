@@ -51,6 +51,6 @@ void InitMap();            // 定义函数用于绘制游戏地图
 void InitSnake();          // 定义函数用于初始化蛇
 int MoveSnake();           // 定义函数用于移动蛇
 void GenerateFood();       // 定义函数用于生成食物
-int CheckCollision();      // 定义函数用于检查碰撞
+SnakeNode* CheckCollision();      // 定义函数用于检查碰撞
 void SpeedControl();       // 定义函数用于控制蛇的速度
 void FreeSnake();          // 定义函数用于释放蛇的内存
