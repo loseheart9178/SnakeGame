@@ -41,15 +41,25 @@ gdb --version
 在项目根目录执行：
 
 ```powershell
-gcc -fdiagnostics-color=always -finput-charset=utf-8 -fexec-charset=GBK -g snake_main.c snake.c ranking.c -o snake.exe
+gcc -fdiagnostics-color=always -finput-charset=utf-8 -fexec-charset=GBK -g *.c -o snake.exe
 .\snake.exe
 ```
+
+说明：项目中的 VS Code 任务已配置为默认编译全部 `.c` 源文件，新增源文件后通常无需再手动修改任务参数。
 
 ## 排行榜说明
 
 - 排行榜文件为 `rankings.dat`（在程序运行目录生成）。
 - 每局结束会尝试写入排行榜。
 - 仅保留 Top 10 高分；当已满 10 条时，只有新分数高于当前第 10 名才会更新。
+- `rankings.dat` 属于运行时数据，已在 `.gitignore` 中忽略，不建议提交到仓库。
+
+## 仓库提交说明
+
+- 已建议提交以下 VS Code 配置文件（便于他人拉取后直接构建/调试）：
+   - `.vscode/tasks.json`
+   - `.vscode/launch.json`
+- `.gitignore` 已配置为：忽略 `.vscode` 目录下其他文件，仅放行上述两个 JSON 文件。
 
 ## 常见问题
 
