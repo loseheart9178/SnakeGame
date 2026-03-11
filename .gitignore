@@ -10,8 +10,13 @@
 *~
 *.tmp
 
+# Ignore runtime game data
+rankings.dat
+
 # Ignore editor directories and settings
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 .idea/
 
 # Ignore compiled libraries
