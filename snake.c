@@ -101,9 +101,6 @@ void InitMap() // 定义函数用于绘制游戏地图
     }
 
 
-    //生成初始食物
-    GenerateFood();
-
     // 显示初始得分
     GotoXY(50, 5);
     printf("得分：0");
@@ -115,6 +112,7 @@ void InitSnake() // 定义函数用于初始化蛇
     
     snake.length = INITIAL_SNAKE_LENGTH;
     snake.speed = 250;
+    snake.pendingGrowth = 0;
     now_Direction = RIGHT;
 
     // 创建蛇头
@@ -173,8 +171,10 @@ void GenerateFood() // 定义函数用于生成食物
     }
     food.x = x;              // 设置食物的x坐标
     food.y = y;              // 设置食物的y坐标
+    // 随机决定是否为特殊食物（10%概率）
+    food.special = (rand() % 10 == 0) ? 1 : 0;
     GotoXY(food.x, food.y);  // 设置光标位置
-    printf("%c", FOOD_CHAR); // 显示食物
+    printf("%c", food.special ? SPECIAL_FOOD_CHAR : FOOD_CHAR); // 显示食物
 }
 
 // 随机布置障碍物，确保不和蛇或互相重叠
@@ -268,19 +268,29 @@ int MoveSnake()
 
     // 3. 检查吃到食物
     if (snake.head->x == food.x && snake.head->y == food.y) {
-        snake.length++;
+        if (food.special) {
+            // 特殊食物，增长两节
+            snake.length += 2;
+            snake.pendingGrowth = 1; // 下一次移动也不去尾部
+        } else {
+            snake.length++;
+        }
         GenerateFood();
         GotoXY(50, 5);
         printf("得分：%d", snake.length - INITIAL_SNAKE_LENGTH);
     } else {
-        // 没吃到食物：移除尾部
-        SnakeNode *oldTail = snake.tail;
-        GotoXY(oldTail->x, oldTail->y);
-        printf(" "); // 清除屏幕上的尾巴
-        
-        snake.tail = oldTail->prev;
-        snake.tail->next = NULL;
-        free(oldTail); // 释放内存
+        // 没吃到食物：检查是否仍有挂起增长
+        if (snake.pendingGrowth > 0) {
+            snake.pendingGrowth--;
+        } else {
+            SnakeNode *oldTail = snake.tail;
+            GotoXY(oldTail->x, oldTail->y);
+            printf(" "); // 清除屏幕上的尾巴
+            
+            snake.tail = oldTail->prev;
+            snake.tail->next = NULL;
+            free(oldTail); // 释放内存
+        }
     }
 
     // 4. 检查碰撞
@@ -398,6 +408,8 @@ void SpeedControl()
         snake.speed = 60;
         break;
     case 30:
+
+    
         snake.speed = 40;
         break;
     default:

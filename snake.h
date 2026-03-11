@@ -12,7 +12,9 @@
 #define RIGHT 'd'                                 // 定义向右移动的按键
 #define INITIAL_SNAKE_LENGTH 3                    // 定义初始蛇的长度
 #define Max_SNAKE_LENGTH (MAP_HEIGHT * MAP_WIDTH) // 定义蛇的最大长度为地图面积
-#define FOOD_CHAR '$'                             // 定义食物的显示字符
+#define FOOD_CHAR '$'                             // 定义普通食物的显示字符
+#define SPECIAL_FOOD_CHAR '*'                     // 定义特殊食物的显示字符（增两节身体）
+
 #define SNAKE_HEAD_CHAR '@'                       // 定义蛇头的显示字符
 #define SNAKE_BODY_CHAR 'o'                       // 定义蛇身的显示字符
 #define MAP_CHAR '|'                              // 定义地图的显示字符`
@@ -34,6 +36,7 @@ typedef struct
 {
     int x;
     int y;
+    int special;    // 0=普通食物，1=特殊食物
 } Food;
 
 // 障碍物结构体
@@ -49,6 +52,7 @@ typedef struct
     SnakeNode *tail;        // 指向蛇尾的指针
     int length;             // 蛇的长度
     int speed;              // 蛇的速度
+    int pendingGrowth;      // 额外未消耗的增长次数（用于特殊食物）
 } Snake;
 
 
@@ -57,6 +61,8 @@ void GotoXY(int x, int y); // 定义函数用于设置光标位置
 void HideCursor();         // 定义函数用于隐藏光标
 int InitMenu();            // 定义函数用于显示菜单并获取用户选择
 void Helper();             // 定义函数用于显示帮助信息
+
+// 更新帮助文本以说明特殊食物
 void About();              // 定义函数用于显示关于信息
 void InitMap();            // 定义函数用于绘制游戏地图
 void InitSnake();          // 定义函数用于初始化蛇
