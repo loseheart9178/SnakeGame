@@ -23,6 +23,7 @@ int main()
             GenerateObstacles();
             GenerateFood(); // 生成食物
             while (MoveSnake()); // 移动蛇，直到游戏结束
+            GameOver();          // 显示游戏结束信息
             break;
         case 2:
             // 显示帮助

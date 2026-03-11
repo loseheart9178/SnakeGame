@@ -21,7 +21,7 @@
 
 // 障碍物相关
 #define OBSTACLE_CHAR '#'                         // 定义障碍物的显示字符
-#define OBSTACLE_COUNT 20                         // 定义地图中障碍物数量
+#define OBSTACLE_COUNT 10                         // 定义地图中障碍物数量
 
 // 定义游戏相关的结构体
 typedef struct SnakeNode
@@ -75,3 +75,4 @@ int IsPositionBlocked(int x, int y); // 检查坐标是否为障碍或蛇身
 
 void SpeedControl();       // 定义函数用于控制蛇的速度
 void FreeSnake();          // 定义函数用于释放蛇的内存
+void GameOver();           // 定义函数用于显示游戏结束信息

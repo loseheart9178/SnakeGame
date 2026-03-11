@@ -297,12 +297,6 @@ int MoveSnake()
     SnakeNode* collisionNode = CheckCollision();
     if (collisionNode == (SnakeNode*)-1) {
         // 墙碰撞，结束
-        GotoXY(45, 14);
-        printf("Game Over! Score: %d", snake.length - INITIAL_SNAKE_LENGTH);
-        GotoXY(45, 16);
-        printf("GAME OVER!");
-        getch(); // 等待按键
-        system("cls");
         return 0;
     } else if (collisionNode != NULL) {
         // 自撞后，截断从collisionNode到tail
@@ -321,12 +315,6 @@ int MoveSnake()
         if (snake.tail) snake.tail->next = NULL;
         // 检查长度
         if (snake.length <= 1) {
-            GotoXY(45, 14);
-            printf("Game Over! Score: %d", snake.length - INITIAL_SNAKE_LENGTH);
-            GotoXY(45, 16);
-            printf("GAME OVER!");
-            getch(); // 等待按键
-            system("cls");
             return 0;
         }
     }
@@ -428,4 +416,24 @@ void FreeSnake()
         curr = next;
     }
     snake.head = snake.tail = NULL;
+}
+
+void GameOver()
+{
+    system("cls"); // 清屏
+    
+    GotoXY(35, 10);
+    printf("==============================");
+    GotoXY(43, 12);
+    printf("游 戏 结 束 !");
+    GotoXY(44, 14);
+    printf("最终得分: %d", snake.length - INITIAL_SNAKE_LENGTH);
+    GotoXY(35, 16);
+    printf("==============================");
+    
+    GotoXY(39, 18);
+    printf("按任意键返回主菜单...");
+    
+    getch();
+    system("cls");
 }
