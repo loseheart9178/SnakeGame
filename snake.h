@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <time.h>
 #include <conio.h>
+#include "ranking.h"
 
 // 定义游戏相关的常量
 #define MAP_HEIGHT 20                             // 定义地图高度

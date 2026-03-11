@@ -32,7 +32,9 @@ int InitMenu() // 定义函数用于显示菜单并获取用户选择
     GotoXY(43, 18);                 // 设置光标位置
     printf("3. 关于");              // 显示菜单选项4
     GotoXY(43, 20);                 // 设置光标位置
-    printf("按任意键退出");       // 显示菜单选项5
+    printf("4. 积分排行榜");       // 显示菜单选项5
+    GotoXY(43, 22);                 // 设置光标位置
+    printf("按任意键退出");       // 显示菜单选项6
     HideCursor();                   // 隐藏光标
     printf("请输入您的选择:");
     char choice = getch(); // 获取用户输入的选择
@@ -47,6 +49,9 @@ int InitMenu() // 定义函数用于显示菜单并获取用户选择
         break;
     case '3':
         result = 3; // 用户选择关于
+        break;
+    case '4':
+        result = 4; // 用户选择积分排行榜
         break;
     default:
         break;
@@ -420,6 +425,9 @@ void FreeSnake()
 
 void GameOver()
 {
+    int finalScore = snake.length - INITIAL_SNAKE_LENGTH;
+    SaveScore(finalScore);
+
     system("cls"); // 清屏
     
     GotoXY(35, 10);

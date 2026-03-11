@@ -33,6 +33,10 @@ int main()
             // 显示关于
             About();
             break;
+        case 4:
+            // 显示积分排行榜
+            ShowRankings();
+            break;
         case 0:
             // 退出游戏
             end = 0;
