@@ -13,16 +13,18 @@
 #define RIGHT 'd'                                 // 定义向右移动的按键
 #define INITIAL_SNAKE_LENGTH 3                    // 定义初始蛇的长度
 #define Max_SNAKE_LENGTH (MAP_HEIGHT * MAP_WIDTH) // 定义蛇的最大长度为地图面积
-#define FOOD_CHAR '$'                             // 定义普通食物的显示字符
-#define SPECIAL_FOOD_CHAR '*'                     // 定义特殊食物的显示字符（增两节身体）
+#define B_FOOD_CHAR '*'                            // 定义B级食物的显示字符
+#define A_FOOD_CHAR 'x'                            // 定义A级食物的显示字符
+#define S_FOOD_CHAR '$'                            // 定义S级食物的显示字符
+#define SSR_FOOD_CHAR '?'                           // 定义SSR级食物的显示字符
 
-#define SNAKE_HEAD_CHAR '@'                       // 定义蛇头的显示字符
-#define SNAKE_BODY_CHAR 'o'                       // 定义蛇身的显示字符
-#define MAP_CHAR '|'                              // 定义地图的显示字符`
+#define SNAKE_HEAD_CHAR '@' // 定义蛇头的显示字符
+#define SNAKE_BODY_CHAR 'o' // 定义蛇身的显示字符
+#define MAP_CHAR '|'        // 定义地图的显示字符`
 
 // 障碍物相关
-#define OBSTACLE_CHAR '#'                         // 定义障碍物的显示字符
-#define OBSTACLE_COUNT 10                         // 定义地图中障碍物数量
+#define OBSTACLE_CHAR '#' // 定义障碍物的显示字符
+#define OBSTACLE_COUNT 10 // 定义地图中障碍物数量
 
 // 定义游戏相关的结构体
 typedef struct SnakeNode
@@ -37,7 +39,7 @@ typedef struct
 {
     int x;
     int y;
-    int special;    // 0=普通食物，1=特殊食物
+    int value; // 价值不同，得分不同
 } Food;
 
 // 障碍物结构体
@@ -49,13 +51,12 @@ typedef struct
 
 typedef struct
 {
-    SnakeNode *head;        // 指向蛇头的指针
-    SnakeNode *tail;        // 指向蛇尾的指针
-    int length;             // 蛇的长度
-    int speed;              // 蛇的速度
-    int pendingGrowth;      // 额外未消耗的增长次数（用于特殊食物）
+    SnakeNode *head;   // 指向蛇头的指针
+    SnakeNode *tail;   // 指向蛇尾的指针
+    int length;        // 蛇的长度
+    int speed;         // 蛇的速度
+    int pendingGrowth; // 额外未消耗的增长次数（用于特殊食物）
 } Snake;
-
 
 // 定义游戏相关的函数
 void GotoXY(int x, int y); // 定义函数用于设置光标位置
@@ -64,16 +65,16 @@ int InitMenu();            // 定义函数用于显示菜单并获取用户选�
 void Helper();             // 定义函数用于显示帮助信息
 
 // 更新帮助文本以说明特殊食物
-void About();              // 定义函数用于显示关于信息
-void InitMap();            // 定义函数用于绘制游戏地图
-void InitSnake();          // 定义函数用于初始化蛇
-int MoveSnake();           // 定义函数用于移动蛇
-void GenerateFood();       // 定义函数用于生成食物
-void GenerateObstacles();  // 定义函数用于生成障碍物
+void About();             // 定义函数用于显示关于信息
+void InitMap();           // 定义函数用于绘制游戏地图
+void InitSnake();         // 定义函数用于初始化蛇
+int MoveSnake();          // 定义函数用于移动蛇
+void GenerateFood();      // 定义函数用于生成食物
+void GenerateObstacles(); // 定义函数用于生成障碍物
 
-SnakeNode* CheckCollision();      // 定义函数用于检查碰撞
+SnakeNode *CheckCollision();         // 定义函数用于检查碰撞
 int IsPositionBlocked(int x, int y); // 检查坐标是否为障碍或蛇身
 
-void SpeedControl();       // 定义函数用于控制蛇的速度
-void FreeSnake();          // 定义函数用于释放蛇的内存
-void GameOver();           // 定义函数用于显示游戏结束信息
+void SpeedControl(); // 定义函数用于控制蛇的速度
+void FreeSnake();    // 定义函数用于释放蛇的内存
+void GameOver();     // 定义函数用于显示游戏结束信息

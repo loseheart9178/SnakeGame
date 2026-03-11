@@ -1,11 +1,10 @@
 #include "snake.h"
 
-
-Snake snake;                // 定义全局变量蛇
-Food food;                  // 定义全局变量食物
+Snake snake;                        // 定义全局变量蛇
+Food food;                          // 定义全局变量食物
 Obstacle obstacles[OBSTACLE_COUNT]; // 障碍物数组
-char now_Direction = RIGHT; // 定义全局变量当前方向
-char direction = RIGHT;     // 定义全局变量用户输入的方向
+char now_Direction = RIGHT;         // 定义全局变量当前方向
+char direction = RIGHT;             // 定义全局变量用户输入的方向
 
 void GotoXY(int x, int y) // 定义函数用于设置光标位置
 {
@@ -32,9 +31,9 @@ int InitMenu() // 定义函数用于显示菜单并获取用户选择
     GotoXY(43, 18);                 // 设置光标位置
     printf("3. 关于");              // 显示菜单选项4
     GotoXY(43, 20);                 // 设置光标位置
-    printf("4. 积分排行榜");       // 显示菜单选项5
+    printf("4. 积分排行榜");        // 显示菜单选项5
     GotoXY(43, 22);                 // 设置光标位置
-    printf("按任意键退出");       // 显示菜单选项6
+    printf("按任意键退出");         // 显示菜单选项6
     HideCursor();                   // 隐藏光标
     printf("请输入您的选择:");
     char choice = getch(); // 获取用户输入的选择
@@ -105,7 +104,6 @@ void InitMap() // 定义函数用于绘制游戏地图
         printf("%c", MAP_CHAR);
     }
 
-
     // 显示初始得分
     GotoXY(50, 5);
     printf("得分：0");
@@ -114,14 +112,14 @@ void InitSnake() // 定义函数用于初始化蛇
 {
     // 释放之前的内存（如果存在）
     FreeSnake();
-    
+
     snake.length = INITIAL_SNAKE_LENGTH;
     snake.speed = 250;
     snake.pendingGrowth = 0;
     now_Direction = RIGHT;
 
     // 创建蛇头
-    snake.head = (SnakeNode*)malloc(sizeof(SnakeNode));
+    snake.head = (SnakeNode *)malloc(sizeof(SnakeNode));
     snake.head->x = MAP_WIDTH / 2 - 1;
     snake.head->y = MAP_HEIGHT / 2 - 1;
     snake.head->prev = NULL;
@@ -132,11 +130,12 @@ void InitSnake() // 定义函数用于初始化蛇
     printf("%c", SNAKE_HEAD_CHAR);
 
     // 创建初始蛇身
-    for (int i = 1; i < snake.length; i++) {
-        SnakeNode *newNode = (SnakeNode*)malloc(sizeof(SnakeNode));
+    for (int i = 1; i < snake.length; i++)
+    {
+        SnakeNode *newNode = (SnakeNode *)malloc(sizeof(SnakeNode));
         newNode->x = snake.tail->x - 1;
         newNode->y = snake.tail->y;
-        
+
         newNode->prev = snake.tail;
         newNode->next = NULL;
         snake.tail->next = newNode;
@@ -157,29 +156,56 @@ void GenerateFood() // 定义函数用于生成食物
         // 检查(x, y)是否与蛇身体或障碍重叠
         valid = 1;
         SnakeNode *curr = snake.head;
-        while (curr != NULL) {
-            if (x == curr->x && y == curr->y) {
+        while (curr != NULL)
+        {
+            if (x == curr->x && y == curr->y)
+            {
                 valid = 0; // 与蛇身体重叠，重新生成
                 break;
             }
             curr = curr->next;
         }
         // 跳出后再检查障碍
-        if (valid) {
-            for (int i = 0; i < OBSTACLE_COUNT; i++) {
-                if (x == obstacles[i].x && y == obstacles[i].y) {
+        if (valid)
+        {
+            for (int i = 0; i < OBSTACLE_COUNT; i++)
+            {
+                if (x == obstacles[i].x && y == obstacles[i].y)
+                {
                     valid = 0;
                     break;
                 }
             }
         }
     }
-    food.x = x;              // 设置食物的x坐标
-    food.y = y;              // 设置食物的y坐标
-    // 随机决定是否为特殊食物（10%概率）
-    food.special = (rand() % 10 == 0) ? 1 : 0;
-    GotoXY(food.x, food.y);  // 设置光标位置
-    printf("%c", food.special ? SPECIAL_FOOD_CHAR : FOOD_CHAR); // 显示食物
+    food.x = x; // 设置食物的x坐标
+    food.y = y; // 设置食物的y坐标
+    // 随机决定食物等级
+    int randVal = rand() % 100;
+    char foodChar;
+    if (randVal < 40)
+    {
+        food.value = 1; // B级食物
+        foodChar = B_FOOD_CHAR;
+    }
+    else if (40 <= randVal && randVal < 70)
+    {
+        food.value = 2; // A级食物
+        foodChar = A_FOOD_CHAR;
+    }
+    else if (70 <= randVal && randVal < 90)
+    {
+        food.value = 5; // S级食物
+        foodChar = S_FOOD_CHAR;
+    }
+    else
+    {
+        food.value = 10; // SSR级食物
+        foodChar = SSR_FOOD_CHAR;
+    }
+
+    GotoXY(food.x, food.y); // 设置光标位置
+    printf("%c", foodChar); // 打印食物
 }
 
 // 随机布置障碍物，确保不和蛇或互相重叠
@@ -193,23 +219,29 @@ void GenerateObstacles()
         // 不允许放在蛇原点附近（蛇尚未初始化时，head可能为空）
         int conflict = 0;
         // 检查与已有障碍重叠
-        for (int j = 0; j < i; j++) {
-            if (obstacles[j].x == x && obstacles[j].y == y) {
+        for (int j = 0; j < i; j++)
+        {
+            if (obstacles[j].x == x && obstacles[j].y == y)
+            {
                 conflict = 1;
                 break;
             }
         }
-        if (conflict) continue;
+        if (conflict)
+            continue;
         // 检查是否在蛇身上（如果蛇已初始化）
         SnakeNode *curr = snake.head;
-        while (curr != NULL) {
-            if (curr->x == x && curr->y == y) {
+        while (curr != NULL)
+        {
+            if (curr->x == x && curr->y == y)
+            {
                 conflict = 1;
                 break;
             }
             curr = curr->next;
         }
-        if (conflict) continue;
+        if (conflict)
+            continue;
         // 位置有效，记录并绘制
         obstacles[i].x = x;
         obstacles[i].y = y;
@@ -221,9 +253,10 @@ void GenerateObstacles()
 int MoveSnake()
 {
     fflush(stdout);
-    
+
     // 1. 获取输入（同原逻辑）
-    if (_kbhit()) {
+    if (_kbhit())
+    {
         direction = getch();
         switch (direction)
         {
@@ -247,15 +280,24 @@ int MoveSnake()
     }
 
     // 2. 创建新头节点
-    SnakeNode *newHead = (SnakeNode*)malloc(sizeof(SnakeNode));
+    SnakeNode *newHead = (SnakeNode *)malloc(sizeof(SnakeNode));
     newHead->x = snake.head->x;
     newHead->y = snake.head->y;
-    
-    switch (now_Direction) {
-        case UP:    newHead->y--; break;
-        case DOWN:  newHead->y++; break;
-        case LEFT:  newHead->x--; break;
-        case RIGHT: newHead->x++; break;
+
+    switch (now_Direction)
+    {
+    case UP:
+        newHead->y--;
+        break;
+    case DOWN:
+        newHead->y++;
+        break;
+    case LEFT:
+        newHead->x--;
+        break;
+    case RIGHT:
+        newHead->x++;
+        break;
     }
 
     // 将旧头改为身体符号
@@ -272,26 +314,27 @@ int MoveSnake()
     printf("%c", SNAKE_HEAD_CHAR);
 
     // 3. 检查吃到食物
-    if (snake.head->x == food.x && snake.head->y == food.y) {
-        if (food.special) {
-            // 特殊食物，增长两节
-            snake.length += 2;
-            snake.pendingGrowth = 1; // 下一次移动也不去尾部
-        } else {
-            snake.length++;
-        }
+    if (snake.head->x == food.x && snake.head->y == food.y)
+    {
+        snake.length += food.value;            // 增加长度
+        snake.pendingGrowth += food.value - 1; // 增加挂起增长（因为新头已经占了一个位置，所以挂起增长是食物价值减1）F
         GenerateFood();
         GotoXY(50, 5);
         printf("得分：%d", snake.length - INITIAL_SNAKE_LENGTH);
-    } else {
+    }
+    else
+    {
         // 没吃到食物：检查是否仍有挂起增长
-        if (snake.pendingGrowth > 0) {
+        if (snake.pendingGrowth > 0)
+        {
             snake.pendingGrowth--;
-        } else {
+        }
+        else
+        {
             SnakeNode *oldTail = snake.tail;
             GotoXY(oldTail->x, oldTail->y);
             printf(" "); // 清除屏幕上的尾巴
-            
+
             snake.tail = oldTail->prev;
             snake.tail->next = NULL;
             free(oldTail); // 释放内存
@@ -299,16 +342,20 @@ int MoveSnake()
     }
 
     // 4. 检查碰撞
-    SnakeNode* collisionNode = CheckCollision();
-    if (collisionNode == (SnakeNode*)-1) {
+    SnakeNode *collisionNode = CheckCollision();
+    if (collisionNode == (SnakeNode *)-1)
+    {
         // 墙碰撞，结束
         return 0;
-    } else if (collisionNode != NULL) {
+    }
+    else if (collisionNode != NULL)
+    {
         // 自撞后，截断从collisionNode到tail
-        SnakeNode* newTail = collisionNode->prev;  // 保存新的tail
-        SnakeNode* curr = collisionNode;
-        while (curr != NULL) {
-            SnakeNode* next = curr->next;
+        SnakeNode *newTail = collisionNode->prev; // 保存新的tail
+        SnakeNode *curr = collisionNode;
+        while (curr != NULL)
+        {
+            SnakeNode *next = curr->next;
             GotoXY(curr->x, curr->y);
             printf(" ");
             free(curr);
@@ -317,10 +364,17 @@ int MoveSnake()
         }
         // 更新tail
         snake.tail = newTail;
-        if (snake.tail) snake.tail->next = NULL;
+        if (snake.tail)
+            snake.tail->next = NULL;
         // 检查长度
-        if (snake.length <= 1) {
+        if (snake.length <= 1)
+        {
             return 0;
+        }
+        else
+        {
+            GotoXY(50, 5);
+            printf("得分：%d", snake.length - INITIAL_SNAKE_LENGTH);
         }
     }
 
@@ -328,22 +382,26 @@ int MoveSnake()
     Sleep(snake.speed);
     return 1;
 }
-SnakeNode* CheckCollision()
+SnakeNode *CheckCollision()
 {
     // 碰墙或障碍
-    if (snake.head->x <= 0 || snake.head->x >= MAP_WIDTH - 1 || 
-        snake.head->y <= 0 || snake.head->y >= MAP_HEIGHT - 1) {
-        return (SnakeNode*)-1; // 特殊值表示墙碰撞
+    if (snake.head->x <= 0 || snake.head->x >= MAP_WIDTH - 1 ||
+        snake.head->y <= 0 || snake.head->y >= MAP_HEIGHT - 1)
+    {
+        return (SnakeNode *)-1; // 特殊值表示墙碰撞
     }
     // 障碍
-    for (int i = 0; i < OBSTACLE_COUNT; i++) {
-        if (snake.head->x == obstacles[i].x && snake.head->y == obstacles[i].y) {
-            return (SnakeNode*)-1; // 将障碍当作墙处理
+    for (int i = 0; i < OBSTACLE_COUNT; i++)
+    {
+        if (snake.head->x == obstacles[i].x && snake.head->y == obstacles[i].y)
+        {
+            return (SnakeNode *)-1; // 将障碍当作墙处理
         }
     }
     // 碰自己
     SnakeNode *curr = snake.head->next;
-    while (curr != NULL) {
+    while (curr != NULL)
+    {
         if (snake.head->x == curr->x && snake.head->y == curr->y)
             return curr; // 返回碰撞的节点
         curr = curr->next;
@@ -358,13 +416,15 @@ int IsPositionBlocked(int x, int y)
     if (x <= 0 || x >= MAP_WIDTH - 1 || y <= 0 || y >= MAP_HEIGHT - 1)
         return 1;
     // 障碍
-    for (int i = 0; i < OBSTACLE_COUNT; i++) {
+    for (int i = 0; i < OBSTACLE_COUNT; i++)
+    {
         if (x == obstacles[i].x && y == obstacles[i].y)
             return 1;
     }
     // 蛇身
-    SnakeNode* curr = snake.head;
-    while (curr) {
+    SnakeNode *curr = snake.head;
+    while (curr)
+    {
         if (x == curr->x && y == curr->y)
             return 1;
         curr = curr->next;
@@ -402,7 +462,6 @@ void SpeedControl()
         break;
     case 30:
 
-    
         snake.speed = 40;
         break;
     default:
@@ -415,7 +474,8 @@ void SpeedControl()
 void FreeSnake()
 {
     SnakeNode *curr = snake.head;
-    while (curr != NULL) {
+    while (curr != NULL)
+    {
         SnakeNode *next = curr->next;
         free(curr);
         curr = next;
@@ -429,7 +489,7 @@ void GameOver()
     SaveScore(finalScore);
 
     system("cls"); // 清屏
-    
+
     GotoXY(35, 10);
     printf("==============================");
     GotoXY(43, 12);
@@ -438,10 +498,10 @@ void GameOver()
     printf("最终得分: %d", snake.length - INITIAL_SNAKE_LENGTH);
     GotoXY(35, 16);
     printf("==============================");
-    
+
     GotoXY(39, 18);
     printf("按任意键返回主菜单...");
-    
+
     getch();
     system("cls");
 }
