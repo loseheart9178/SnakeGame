@@ -19,6 +19,8 @@ int main()
             system("cls");  // 清屏，移除菜单文字
             InitMap();      // 初始化游戏地图
             InitSnake();    // 初始化蛇
+            // 生成障碍物（放在蛇初始化后以避免冲突）
+            GenerateObstacles();
             GenerateFood(); // 生成食物
             while (MoveSnake()); // 移动蛇，直到游戏结束
             break;

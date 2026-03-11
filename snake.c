@@ -3,6 +3,7 @@
 
 Snake snake;                // 定义全局变量蛇
 Food food;                  // 定义全局变量食物
+Obstacle obstacles[OBSTACLE_COUNT]; // 障碍物数组
 char now_Direction = RIGHT; // 定义全局变量当前方向
 char direction = RIGHT;     // 定义全局变量用户输入的方向
 
@@ -73,7 +74,7 @@ void Helper() // 定义函数用于显示帮助信息
     GotoXY(40, 16);
     printf("2. 吃食物使蛇变长，得分增加");
     GotoXY(40, 18);
-    printf("3. 碰到墙或自己会游戏结束");
+    printf("3. 碰到墙、自己或障碍物会游戏结束");
     GotoXY(45, 20);
     printf("按任意键返回菜单");
     HideCursor();
@@ -98,6 +99,7 @@ void InitMap() // 定义函数用于绘制游戏地图
         GotoXY(MAP_WIDTH - 1, i);
         printf("%c", MAP_CHAR);
     }
+
 
     //生成初始食物
     GenerateFood();
@@ -149,7 +151,7 @@ void GenerateFood() // 定义函数用于生成食物
     {
         x = rand() % (MAP_WIDTH - 2) + 1;  // 生成随机的x坐标，范围在地图内
         y = rand() % (MAP_HEIGHT - 2) + 1; // 生成随机的y坐标，范围在地图内
-        // 检查(x, y)是否与蛇身体重叠
+        // 检查(x, y)是否与蛇身体或障碍重叠
         valid = 1;
         SnakeNode *curr = snake.head;
         while (curr != NULL) {
@@ -159,11 +161,57 @@ void GenerateFood() // 定义函数用于生成食物
             }
             curr = curr->next;
         }
+        // 跳出后再检查障碍
+        if (valid) {
+            for (int i = 0; i < OBSTACLE_COUNT; i++) {
+                if (x == obstacles[i].x && y == obstacles[i].y) {
+                    valid = 0;
+                    break;
+                }
+            }
+        }
     }
     food.x = x;              // 设置食物的x坐标
     food.y = y;              // 设置食物的y坐标
     GotoXY(food.x, food.y);  // 设置光标位置
     printf("%c", FOOD_CHAR); // 显示食物
+}
+
+// 随机布置障碍物，确保不和蛇或互相重叠
+void GenerateObstacles()
+{
+    int i = 0;
+    while (i < OBSTACLE_COUNT)
+    {
+        int x = rand() % (MAP_WIDTH - 2) + 1;
+        int y = rand() % (MAP_HEIGHT - 2) + 1;
+        // 不允许放在蛇原点附近（蛇尚未初始化时，head可能为空）
+        int conflict = 0;
+        // 检查与已有障碍重叠
+        for (int j = 0; j < i; j++) {
+            if (obstacles[j].x == x && obstacles[j].y == y) {
+                conflict = 1;
+                break;
+            }
+        }
+        if (conflict) continue;
+        // 检查是否在蛇身上（如果蛇已初始化）
+        SnakeNode *curr = snake.head;
+        while (curr != NULL) {
+            if (curr->x == x && curr->y == y) {
+                conflict = 1;
+                break;
+            }
+            curr = curr->next;
+        }
+        if (conflict) continue;
+        // 位置有效，记录并绘制
+        obstacles[i].x = x;
+        obstacles[i].y = y;
+        GotoXY(x, y);
+        printf("%c", OBSTACLE_CHAR);
+        i++;
+    }
 }
 int MoveSnake()
 {
@@ -279,10 +327,17 @@ int MoveSnake()
 }
 SnakeNode* CheckCollision()
 {
-    // 碰墙
+    // 碰墙或障碍
     if (snake.head->x <= 0 || snake.head->x >= MAP_WIDTH - 1 || 
-        snake.head->y <= 0 || snake.head->y >= MAP_HEIGHT - 1)
+        snake.head->y <= 0 || snake.head->y >= MAP_HEIGHT - 1) {
         return (SnakeNode*)-1; // 特殊值表示墙碰撞
+    }
+    // 障碍
+    for (int i = 0; i < OBSTACLE_COUNT; i++) {
+        if (snake.head->x == obstacles[i].x && snake.head->y == obstacles[i].y) {
+            return (SnakeNode*)-1; // 将障碍当作墙处理
+        }
+    }
     // 碰自己
     SnakeNode *curr = snake.head->next;
     while (curr != NULL) {
@@ -292,6 +347,28 @@ SnakeNode* CheckCollision()
     }
     return NULL; // 没有碰撞
 }
+
+// 检查给定坐标是否已被障碍或蛇身占用
+int IsPositionBlocked(int x, int y)
+{
+    // 墙
+    if (x <= 0 || x >= MAP_WIDTH - 1 || y <= 0 || y >= MAP_HEIGHT - 1)
+        return 1;
+    // 障碍
+    for (int i = 0; i < OBSTACLE_COUNT; i++) {
+        if (x == obstacles[i].x && y == obstacles[i].y)
+            return 1;
+    }
+    // 蛇身
+    SnakeNode* curr = snake.head;
+    while (curr) {
+        if (x == curr->x && y == curr->y)
+            return 1;
+        curr = curr->next;
+    }
+    return 0;
+}
+
 void SpeedControl()
 {
     switch (snake.length)

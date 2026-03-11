@@ -17,6 +17,10 @@
 #define SNAKE_BODY_CHAR 'o'                       // 定义蛇身的显示字符
 #define MAP_CHAR '|'                              // 定义地图的显示字符`
 
+// 障碍物相关
+#define OBSTACLE_CHAR '#'                         // 定义障碍物的显示字符
+#define OBSTACLE_COUNT 20                         // 定义地图中障碍物数量
+
 // 定义游戏相关的结构体
 typedef struct SnakeNode
 {
@@ -31,6 +35,13 @@ typedef struct
     int x;
     int y;
 } Food;
+
+// 障碍物结构体
+typedef struct
+{
+    int x;
+    int y;
+} Obstacle;
 
 typedef struct
 {
@@ -51,6 +62,10 @@ void InitMap();            // 定义函数用于绘制游戏地图
 void InitSnake();          // 定义函数用于初始化蛇
 int MoveSnake();           // 定义函数用于移动蛇
 void GenerateFood();       // 定义函数用于生成食物
+void GenerateObstacles();  // 定义函数用于生成障碍物
+
 SnakeNode* CheckCollision();      // 定义函数用于检查碰撞
+int IsPositionBlocked(int x, int y); // 检查坐标是否为障碍或蛇身
+
 void SpeedControl();       // 定义函数用于控制蛇的速度
 void FreeSnake();          // 定义函数用于释放蛇的内存
