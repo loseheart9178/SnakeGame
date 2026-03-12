@@ -49,10 +49,10 @@ gcc -fdiagnostics-color=always -finput-charset=utf-8 -fexec-charset=GBK -g *.c -
 
 ## 排行榜说明
 
-- 排行榜文件为 `rankings.dat`（在程序运行目录生成）。
+- 排行榜文件为 `rankings.txt`（在程序运行目录生成）。
 - 每局结束会尝试写入排行榜。
 - 仅保留 Top 10 高分；当已满 10 条时，只有新分数高于当前第 10 名才会更新。
-- `rankings.dat` 属于运行时数据，已在 `.gitignore` 中忽略，不建议提交到仓库。
+- `rankings.txt` 属于运行时数据，已在 `.gitignore` 中忽略，不建议提交到仓库。
 
 ## 仓库提交说明
 
@@ -65,9 +65,9 @@ gcc -fdiagnostics-color=always -finput-charset=utf-8 -fexec-charset=GBK -g *.c -
 
 ### 1) 提示 `undefined reference to SaveScore`
 
-原因：编译命令漏掉了 `ranking.c`。
+原因：未使用项目根目录的一体化源码进行编译，或编译命令未包含 `snake.c`。
 
-解决：确保编译命令中包含 `ranking.c`。
+解决：使用 README 中的完整编译命令，或直接执行 VS Code 默认构建任务。
 
 ### 2) VS Code 可以编译，命令行不行
 

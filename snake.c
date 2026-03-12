@@ -485,18 +485,69 @@ void FreeSnake()
     snake.head = snake.tail = NULL;
 }
 
-void SaveScore(int score)
+static void SortRankings(RankEntry rankings[], int count)       // 使用冒泡排序对排行榜进行排序，分数高的排在前面
 {
-    RankEntry rankings[MAX_RANKING_COUNT];
-    int count = 0;
+    for (int i = 0; i < count - 1; i++)
+    {
+        for (int j = 0; j < count - 1 - i; j++)
+        {
+            if (rankings[j].score < rankings[j + 1].score)
+            {
+                RankEntry temp = rankings[j];
+                rankings[j] = rankings[j + 1];
+                rankings[j + 1] = temp;
+            }
+        }
+    }
+}
 
-    // 读取现有排名
-    FILE *file = fopen(RANKING_FILE, "rb");
+static int LoadRankings(RankEntry rankings[])       // 从文件中加载排行榜数据，返回实际加载的条目数
+{
+    int count = 0;
+    FILE *file = fopen(RANKING_FILE, "r");
+
     if (file)
     {
-        count = fread(rankings, sizeof(RankEntry), MAX_RANKING_COUNT, file);
+        char line[64];
+        while (count < MAX_RANKING_COUNT && fgets(line, sizeof(line), file))
+        {
+            int score = 0;
+            char date[20] = {0};
+
+            if (sscanf(line, "%d\t%19[^\r\n]", &score, date) == 2)
+            {
+                rankings[count].score = score;
+                strncpy(rankings[count].date, date, sizeof(rankings[count].date) - 1);
+                rankings[count].date[sizeof(rankings[count].date) - 1] = '\0';
+                count++;
+            }
+        }
         fclose(file);
     }
+
+    return count;
+}
+
+static void SaveRankings(const RankEntry rankings[], int count)     // 将排行榜数据保存到文件中，覆盖原有数据
+{
+    FILE *file = fopen(RANKING_FILE, "w");
+    if (!file)
+    {
+        return;
+    }
+
+    for (int i = 0; i < count; i++)
+    {
+        fprintf(file, "%d\t%s\n", rankings[i].score, rankings[i].date);
+    }
+
+    fclose(file);
+}
+
+void SaveScore(int score)       // 保存分数到排行榜
+{
+    RankEntry rankings[MAX_RANKING_COUNT];
+    int count = LoadRankings(rankings);
 
     // 获取当前时间
     time_t t = time(NULL);
@@ -522,42 +573,17 @@ void SaveScore(int score)
 
     if (inserted)
     {
-        // 冒泡排序，按得分从高到低
-        for (int i = 0; i < count - 1; i++)
-        {
-            for (int j = 0; j < count - 1 - i; j++)
-            {
-                if (rankings[j].score < rankings[j + 1].score)
-                {
-                    RankEntry temp = rankings[j];
-                    rankings[j] = rankings[j + 1];
-                    rankings[j + 1] = temp;
-                }
-            }
-        }
-
-        // 写回文件
-        file = fopen(RANKING_FILE, "wb");
-        if (file)
-        {
-            fwrite(rankings, sizeof(RankEntry), count, file);
-            fclose(file);
-        }
+        SortRankings(rankings, count);
+        SaveRankings(rankings, count);
     }
 }
 
-void ShowRankings()
+void ShowRankings()       // 显示排行榜
 {
     system("cls");
     RankEntry rankings[MAX_RANKING_COUNT];
-    int count = 0;
-
-    FILE *file = fopen(RANKING_FILE, "rb");
-    if (file)
-    {
-        count = fread(rankings, sizeof(RankEntry), MAX_RANKING_COUNT, file);
-        fclose(file);
-    }
+    int count = LoadRankings(rankings);
+    SortRankings(rankings, count);
 
     GotoXY(40, 5);
     printf("=== 积分排行榜 (Top %d) ===", MAX_RANKING_COUNT);
@@ -584,7 +610,7 @@ void ShowRankings()
     system("cls");
 }
 
-void GameOver()
+void GameOver()       // 游戏结束处理
 {
     int finalScore = snake.length - INITIAL_SNAKE_LENGTH;
     SaveScore(finalScore);

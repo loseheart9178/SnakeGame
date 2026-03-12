@@ -22,7 +22,7 @@
 #define MAP_CHAR '|'        // 定义地图的显示字符`
 
 #define MAX_RANKING_COUNT 10
-#define RANKING_FILE "rankings.dat"
+#define RANKING_FILE "rankings.txt"
 
 // 障碍物相关
 #define OBSTACLE_CHAR '#' // 定义障碍物的显示字符

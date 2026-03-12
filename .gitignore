@@ -12,6 +12,7 @@
 
 # Ignore runtime game data
 rankings.dat
+rankings.txt
 
 # Ignore editor directories and settings
 .vscode/*
