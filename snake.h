@@ -2,7 +2,6 @@
 #include <Windows.h>
 #include <time.h>
 #include <conio.h>
-#include "ranking.h"
 
 // 定义游戏相关的常量
 #define MAP_HEIGHT 20                             // 定义地图高度
@@ -21,6 +20,9 @@
 #define SNAKE_HEAD_CHAR '@' // 定义蛇头的显示字符
 #define SNAKE_BODY_CHAR 'o' // 定义蛇身的显示字符
 #define MAP_CHAR '|'        // 定义地图的显示字符`
+
+#define MAX_RANKING_COUNT 10
+#define RANKING_FILE "rankings.dat"
 
 // 障碍物相关
 #define OBSTACLE_CHAR '#' // 定义障碍物的显示字符
@@ -58,6 +60,11 @@ typedef struct
     int pendingGrowth; // 额外未消耗的增长次数（用于特殊食物）
 } Snake;
 
+typedef struct {
+    int score;
+    char date[20];
+} RankEntry;
+
 // 定义游戏相关的函数
 void GotoXY(int x, int y); // 定义函数用于设置光标位置
 void HideCursor();         // 定义函数用于隐藏光标
@@ -78,3 +85,5 @@ int IsPositionBlocked(int x, int y); // 检查坐标是否为障碍或蛇身
 void SpeedControl(); // 定义函数用于控制蛇的速度
 void FreeSnake();    // 定义函数用于释放蛇的内存
 void GameOver();     // 定义函数用于显示游戏结束信息
+void SaveScore(int score);
+void ShowRankings();
